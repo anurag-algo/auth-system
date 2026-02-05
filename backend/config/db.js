@@ -5,9 +5,10 @@ dotenv.config();
 
 const connetDB = async () => {
   try {
-    const cnn = mongoose.connect(process.env.MONGODB_URI);
-    console.log(`MongoDB connected: ${cnn.connection.host}`);
+    await mongoose.connect(process.env.MONGODB_URI);
+    console.log(`MongoDB connected successfully`);
   } catch (error) {
     console.log(`error: ${error.message}`);
   }
 };
+export default connetDB;
