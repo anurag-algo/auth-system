@@ -40,8 +40,13 @@ const userSchema = new mongoose.Schema(
     },
   },
   { timestamps: true },
+  //it used in ligin api colling to //compare password
+  (userSchema.methods.comparePassword = async function (enteredPassword) {
+    return await bcrypt.compare(enteredPassword, this.password);
+  }),
 );
 
+//encrypt password before saving the user model
 userSchema.pre("save", async function (next) {
   if (!this.isModified("password")) return next();
   this.password = await bcrypt.hash(this.password, 10);
