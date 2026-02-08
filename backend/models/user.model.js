@@ -1,5 +1,6 @@
 import mongoose from "mongoose";
 import bcrypt from "bcrypt";
+
 const userSchema = new mongoose.Schema(
   {
     name: {
@@ -7,48 +8,53 @@ const userSchema = new mongoose.Schema(
       required: true,
       trim: true,
     },
+
     email: {
       type: String,
       required: true,
       unique: true,
-      trim: true,
       lowercase: true,
+      trim: true,
     },
+
     password: {
       type: String,
       required: true,
       minlength: 6,
       select: false,
     },
+
     role: {
       type: String,
       enum: ["user", "admin"],
       default: "user",
     },
+
     isVerified: {
       type: Boolean,
       default: false,
     },
-    refreshToken: {
-      type: String,
-    },
-    resetPasswordToken: {
-      type: String,
-    },
-    resetPasswordExpiry: {
-      type: Date,
-    },
+
+    refreshToken: String,
+
+    resetPasswordToken: String,
+    resetPasswordExpiry: Date,
   },
-  { timestamps: true },
-  //it used in ligin api colling to //compare password
-  (userSchema.methods.comparePassword = async function (enteredPassword) {
-    return await bcrypt.compare(enteredPassword, this.password);
-  }),
+  {
+    timestamps: true,
+  },
 );
 
-//encrypt password before saving the user model
+/* 🔐 Password Hashing */
 userSchema.pre("save", async function (next) {
   if (!this.isModified("password")) return next();
   this.password = await bcrypt.hash(this.password, 10);
 });
-export default mongoose.model("User", userSchema);
+
+/* 🔑 Password Compare Method */
+userSchema.methods.comparePassword = async function (enteredPassword) {
+  return await bcrypt.compare(enteredPassword, this.password);
+};
+
+const User = mongoose.model("User", userSchema);
+export default User;
