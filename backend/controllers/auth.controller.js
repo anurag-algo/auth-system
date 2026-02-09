@@ -120,3 +120,27 @@ export const refreshTokenController = async (req, res) => {
     res.status(401).json({ message: "Refresh failed" });
   }
 };
+
+export const logoutUser = async (req, res) => {
+  try {
+    const refreshToken = req.cookies?.refreshToken;
+    if (refreshToken) {
+      await User.findOneAndUpdate({ refreshToken }, { refreshToken: null });
+    }
+
+    //clear cookies
+    res.clearCookie("accessToken", {
+      httpOnly: true,
+      sameSite: "strict",
+    });
+    res.clearCokie("refreshToken", {
+      httpOnly: true,
+      sameSite: "strict",
+    });
+
+    res.status(200).json({ message: "Logout successful" });
+  } catch (error) {
+    console.error("Error in logoutUser:", error);
+    res.status(500).json({ message: "Server error" });
+  }
+};
