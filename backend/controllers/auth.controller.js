@@ -5,6 +5,7 @@ import {
   generateAccessToken,
   generateRRefreshToken,
 } from "../utils/generateToken.js";
+
 export const registerUser = async (req, res) => {
   try {
     const { name, email, password } = req.body;
